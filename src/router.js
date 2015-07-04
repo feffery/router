@@ -1,13 +1,20 @@
-/* Usage
+/* Router Usage
+
 var router = new Router({
-  pushState
+  pushState: true
 })
+
+router.when( '/users/:user', loadUser )
+router.when( '*', show404 )
+
+router.start()
 
 */
 
 class Router {
   constructor( options = {} ){
     this.options = options
+    this.registeredRoutes = []
 
     var o = this.options
     o.pushState = o.pushState || false
@@ -55,7 +62,7 @@ class Router {
    *     }
    *   }
    *
-   * parseUrl accepts the url it is to parse as it's only argument
+   * @param url String The url that has been matched
    */
   parseUrl( url ){
     //TODO finish this method
@@ -74,10 +81,35 @@ class Router {
     //TODO finish this method
   },
 
-  /* updateUrl pushes the url in the required format.
-   * updateUrl does NOT trigger any handlers.
+  when( url, enterHandler, exitHandler ){
+    enterHandler = enterHandler || noop
+    exitHandler = exitHandler || noop
+
+    this.registeredRoutes.push({
+      match: url,
+      regex: this._constructRegex( url ),
+      enter: enter,
+      exit: exit
+    })
+  }
+
+  // Start will begin the router lifecycle.
+  // This must be called after all callbacks and options are set.
+  start(){
+    var url = this.parseUrl()
+
+    //TODO finish this method
+  },
+
+  // _constructRegex builds a regex out of a route url
+  _constructRegex( urlRoute ){
+    //TODO finish this method
+  },
+
+  /* _updateUrl pushes the url in the required format.
+   * _updateUrl does NOT trigger any handlers.
    */
-  updateUrl( url, title ){
+  _updateUrl( url, title ){
     title = title || ''
 
     url = this.options.baseUrl + url
@@ -88,16 +120,16 @@ class Router {
     }
   },
 
-  // Start will begin the router lifecycle.
-  // This must be called after all callbacks and options are set.
-  start(){
-    var url = this.parseUrl()
-  },
-
   // _silentHashPush will attempt to set the url hash without triggering the
   // page change callbacks.
   _silentHashPush( url ){
     this._ignoreHashChange = true
     location.hash = url
-  }
+  },
 }
+
+/*
+ * Utilities
+ */
+
+function noop(){}
